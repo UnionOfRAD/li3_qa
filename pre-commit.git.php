@@ -72,7 +72,7 @@ foreach ($files as $file) {
 }
 
 if ($errorState) {
-	echo "\nError(s) found. Bypass this check with the --no-verify flag\n";
+	echo "\nError(s) found. Bypass check(s) with the `--no-verify` flag.\n";
 	exit(1);
 }
 exit(0);
