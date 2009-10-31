@@ -1,0 +1,3 @@
+[submodule "libraries/phpca"]
+	path = libraries/phpca
+	url = git://github.com/davidpersson/phpca.git
