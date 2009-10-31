@@ -26,7 +26,7 @@ $checkEach['phpca'] = function($file) {
 	exec("php {$phpcaCommand} -p {$phpCommand} --standard {$standard} {$file}", $output, $return);
 
 	if ($return != 0) {
-		return array_slice($output, 9, -3);
+		return array_filter(array_slice($output, 9, -3));
 	}
 };
 
