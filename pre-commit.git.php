@@ -51,7 +51,6 @@ $against = $return ? '4b825dc642cb6eb9a060e54bf8d69288fbee4904' : 'HEAD';
 exec("git diff-index --cached --name-only {$against}", $output);
 
 $files = $output;
-$numberFiles = count($files);
 $errorState = false;
 $hr = str_repeat('-', 80);
 
