@@ -1,20 +1,25 @@
 #!/usr/bin/env php -q
 <?php
+/**
+ * Lithium Hooks
+ *
+ * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
-/* Configuration. Adjust as necessary. */
+namespace lithium_hooks;
 
-$phpCommand = '/opt/local/bin/php';
+/* Checks. Disable/enable or add and modify. */
 
 $checkEach = array();
 $checkAll = array();
 
-/* Checks. Disable/enable or add and modify. */
-
 /* Enforce Lithium coding standards using phpca. */
-$checkEach['phpca'] = function($file) use ($phpCommand) {
+$checkEach['phpca'] = function($file) {
 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 		return null;
 	}
+	$phpCommand = trim(shell_exec('which php'));
 	$phpcaCommand = escapeshellarg(__DIR__ . '/libraries/phpca/src/phpca.php');
 	$file = escapeshellarg($file);
 	$standard = escapeshellarg(__DIR__ . '/extensions/phpca/Standard/lithium.ini');
