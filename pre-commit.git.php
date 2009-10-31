@@ -11,15 +11,14 @@ namespace lithium_hooks;
 
 /* Checks. Disable/enable or add and modify. */
 
-$checkEach = array();
-$checkAll = array();
+$checks = array();
 
 /* Enforce Lithium coding standards using phpca. */
-$checkEach['phpca'] = function($file) {
+$checks['phpca'] = function($file) {
 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
-		return null;
+		return false;
 	}
-	$phpCommand = trim(shell_exec('which php'));
+	$phpCommand = escapeshellarg(trim(shell_exec('which php')));
 	$phpcaCommand = escapeshellarg(__DIR__ . '/libraries/phpca/src/phpca.php');
 	$file = escapeshellarg($file);
 	$standard = escapeshellarg(__DIR__ . '/extensions/phpca/Standard/lithium.ini');
@@ -31,9 +30,9 @@ $checkEach['phpca'] = function($file) {
 };
 
 /* Check validity of file using PHP lint. */
-// $checkEach['phplint'] = function($file) {
+// $checks['phplint'] = function($file) {
 // 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
-// 		return null;
+// 		return false;
 // 	}
 // 	$file = escapeshellarg($file);
 // 	exec("php -l {$file} 2> /dev/null", $output, $return);
@@ -56,24 +55,19 @@ $numberFiles = count($files);
 $errorState = false;
 $hr = str_repeat('-', 80);
 
-/* Run checks for multiple files. */
-foreach ($checkAll as $name => $check) {
-	echo "Running check `{$name}` against {$numberFiles} file(s).\n";
-
-	if ($errors = $check($files)) {
-		echo implode("\n", $errors) . "\n";
-		$errorState = true;
-	}
-}
-
-/* Run checks for single files. */
+/* Run checks. */
 foreach ($files as $file) {
-	foreach ($checkEach as $name => $check) {
-		echo "Running check `{$name}` against `{$file}`.\n";
+	foreach ($checks as $name => $check) {
+		echo "Running check `{$name}` against `{$file}`... ";
 
 		if ($errors = $check($file)) {
+			echo "Failed!\n";
 			echo implode("\n", $errors) . "\n\n";
 			$errorState = true;
+		} elseif ($errors === null) {
+			echo "Passed.\n";
+		} else {
+			echo "Skipped.\n";
 		}
 	}
 }
