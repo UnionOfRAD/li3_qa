@@ -13,7 +13,7 @@ namespace lithium_hooks;
 
 $checks = array();
 
-/* Enforce Lithium coding standards using phpca. */
+/* Enforce Lithium coding standards. */
 $checks['PHPca'] = function($file) {
 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 		return false;
@@ -29,7 +29,7 @@ $checks['PHPca'] = function($file) {
 	}
 };
 
-/* Check validity of file using PHP lint. */
+/* Lint. */
 // $checks['PHPlint'] = function($file) {
 // 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 // 		return false;
@@ -52,18 +52,17 @@ exec("git diff-index --cached --name-only {$against}", $output);
 
 $files = $output;
 $errorState = false;
-$hr = str_repeat('-', 80);
 
 /* Run checks. */
 foreach ($files as $file) {
 	foreach ($checks as $name => $check) {
-		echo "Running check `{$name}` against `{$file}`... ";
+		echo "Running check `{$name}` against `{$file}`. ";
 
-		if ($errors = $check($file)) {
+		if ($failures = $check($file)) {
 			echo "Failed!\n";
-			echo implode("\n", $errors) . "\n\n";
+			echo implode("\n", $failures) . "\n\n";
 			$errorState = true;
-		} elseif ($errors === null) {
+		} elseif ($failures === null) {
 			echo "Passed.\n";
 		} else {
 			echo "Skipped.\n";
@@ -72,7 +71,7 @@ foreach ($files as $file) {
 }
 
 if ($errorState) {
-	echo "\nError(s) found. Bypass check(s) with the `--no-verify` flag.\n";
+	echo "\nFailure(s) detected. Bypass with the `--no-verify` flag.\n";
 	exit(1);
 }
 exit(0);
