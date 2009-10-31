@@ -14,7 +14,7 @@ namespace lithium_hooks;
 $checks = array();
 
 /* Enforce Lithium coding standards using phpca. */
-$checks['phpca'] = function($file) {
+$checks['PHPca'] = function($file) {
 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 		return false;
 	}
@@ -30,7 +30,7 @@ $checks['phpca'] = function($file) {
 };
 
 /* Check validity of file using PHP lint. */
-// $checks['phplint'] = function($file) {
+// $checks['PHPlint'] = function($file) {
 // 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 // 		return false;
 // 	}
