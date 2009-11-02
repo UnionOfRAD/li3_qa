@@ -52,6 +52,11 @@ class BranchUpgrade extends \lithium\console\Command {
 			$remote = trim(str_replace('refs/heads/', '', `{$cmd}.merge`));
 			$trackings[$branch] = $remote;
 		}
+
+		if ($current != 'master') {
+			`git checkout master`;
+		}
+
 		$merged = array_map('trim', explode(
 			"\n", str_replace('*', '', trim(`git branch --merged`))
 		));
@@ -91,7 +96,7 @@ class BranchUpgrade extends \lithium\console\Command {
 			}
 
 			$this->out("Checking out branch {$branch}, tracking origin/{$new}-{$branch}");
-			`git checkout -b {$branch} --track`;
+			`git checkout -b {$branch} --track origin/{$new}-{$branch}`;
 		}
 		`git checkout stable`;
 	}
