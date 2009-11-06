@@ -29,7 +29,7 @@ $checks['PHPca'] = function($file) {
 	}
 };
 
-/* Lint. */
+/* PHP syntax check. */
 // $checks['PHPlint'] = function($file) {
 // 	if (!file_exists($file) || !preg_match('/\.php$/', $file)) {
 // 		return false;
@@ -41,6 +41,23 @@ $checks['PHPca'] = function($file) {
 // 		return null;
 // 	}
 // 	return array_filter($output, function($error) { return !empty($error) && $error[0] == 'P'; });
+// };
+
+/* JavaScript syntax check. */
+// $checks['JSlint'] = function($file) {
+// 	if (!file_exists($file) || !preg_match('/\.js$/', $file)) {
+// 		return false;
+// 	}
+// 	$file = escapeshellarg($file);
+// 	exec("jsl -nologo -nosummary -nofilelisting -nocontext -process {$file}", $output, $return);
+//
+// 	if ($return != 3) {
+// 		return null;
+// 	}
+// 	return array_map(function($line) {
+// 		$line = preg_match('/\((?P<line>\d+)\)\:\s(?P<message>.*)/', $line, $matches);
+// 		return "{$matches['message']} on line {$matches['line']}";
+// 	}, $output);
 // };
 
 /* Main execution. You should not need to change anything below. */
