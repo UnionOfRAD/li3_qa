@@ -72,18 +72,24 @@ $errorState = false;
 
 /* Run checks. */
 foreach ($files as $file) {
-	foreach ($checks as $name => $check) {
-		echo "Running check `{$name}` against `{$file}`. ";
+	echo "Running check(s) against `{$file}`. ";
+	$failures = array();
 
-		if ($failures = $check($file)) {
-			echo "Failed!\n";
-			echo implode("\n", $failures) . "\n\n";
+	foreach ($checks as $name => $check) {
+		if ($result = $check($file)) {
+			echo "Failed. ";
 			$errorState = true;
+			$failures = (array)$result;
 		} elseif ($failures === null) {
-			echo "Passed.\n";
+			echo "Passed. ";
 		} else {
-			echo "Skipped.\n";
+			echo "Skipped. ";
 		}
+	}
+	echo "\n";
+
+	if ($failures) {
+		echo implode("\n", $failures) . "\n\n";
 	}
 }
 
