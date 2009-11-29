@@ -7,13 +7,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium_hooks\extensions\commands;
+namespace app\extensions\commands;
 
 /**
  * When pushing a new version, cleans up all local version-dependent feature branches which are
  * based on the existing version, and re-clones them based on the new version. For example:
  *
- * {{{li3 branch_upgrade 1.5 1.6}}}
+ * {{{li3 branch_upgrade --project=/path/to 1.5 1.6}}}
  *
  * Given the local branch `data`, cloned from `origin/1.5-data`, the `data` branch will be dropped
  * and re-checked-out from `origin/1.6-data`.
@@ -23,16 +23,22 @@ namespace lithium_hooks\extensions\commands;
  */
 class BranchUpgrade extends \lithium\console\Command {
 
+	public $project;
+
 	public function run() {
 		if (count($this->request->params['passed']) < 2) {
 			$this->_stop();
 		}
-		`git pull origin`;
-		`git remote prune origin`;
-
+		if (!$this->project) {
+			$this->project = $this->request->env['working'];
+		}
 		list($old, $new) = $this->request->params['passed'];
 		$locals = $remotes = $trackings = array();
 		$current = null;
+
+		chdir($this->project);
+		`git pull origin`;
+		`git remote prune origin`;
 
 		foreach (array_map('trim', explode("\n", trim(`git branch -a`))) as $branch) {
 			if (strpos($branch, 'remotes/') === 0) {
