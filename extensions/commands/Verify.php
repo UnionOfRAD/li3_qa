@@ -25,7 +25,6 @@ class Verify extends \lithium\console\Command {
 
 	public function run($file = null) {
 		if (!$this->checks) {
-			$this->err('You must at least provide one available check using `--checks`.');
 			$this->help();
 			return 1;
 		}
@@ -41,21 +40,8 @@ class Verify extends \lithium\console\Command {
 		if (is_file($file)) {
 			return $this->_verifyFile($file) ? 0 : 1;
 		}
+		return $this->_verifyDirectory($file) ? 0 : 1;
 
-		$base = new RecursiveDirectoryIterator($file);
-		$iterator = new RecursiveIteratorIterator($base);
-		$errors = false;
-
-		foreach ($iterator as $item) {
-			$basename = $item->getBasename();
-			$file = $item->getPathname();
-
-			if (preg_match('/\/' . $this->exclude . '/', $file) || $basename == 'empty') {
-				continue;
-			}
-			$errors = !$this->_verifyFile($file) || $errors;
-		}
-		return $errors ? 1 : 0;
 	}
 
 	protected function _verifyFile($file) {
@@ -82,6 +68,23 @@ class Verify extends \lithium\console\Command {
 			return false;
 		}
 		return true;
+	}
+
+	protected function _verifyDirectory($directory) {
+		$base = new RecursiveDirectoryIterator($directory);
+		$iterator = new RecursiveIteratorIterator($base);
+		$errors = false;
+
+		foreach ($iterator as $item) {
+			$basename = $item->getBasename();
+			$file = $item->getPathname();
+
+			if (preg_match('/\/' . $this->exclude . '/', $file) || $basename == 'empty') {
+				continue;
+			}
+			$errors = !$this->_verifyFile($file) || $errors;
+		}
+		return !$errors;
 	}
 
 	public function checks() {
