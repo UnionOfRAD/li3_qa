@@ -21,11 +21,12 @@ class Verify extends \lithium\console\Command {
 
 	public $project;
 
-	public $exclude = '\.|libraries';
+	public $exclude = '\.';
 
 	public function run($file = null) {
 		if (!$this->checks) {
 			$this->err('You must at least provide one available check using `--checks`.');
+			$this->help();
 			return 1;
 		}
 		$this->checks = explode(',' , $this->checks);
@@ -95,7 +96,9 @@ class Verify extends \lithium\console\Command {
 	}
 
 	public function help() {
-		$this->out('Usage: li3 verify [--project=PROJECT] --checks=<CHECK>[,CHECK] [FILE]');
+		$message  = 'Usage: li3 verify [--project=PROJECT] [--exclude=REGEX] ';
+		$message .= '--checks=<CHECK>[,CHECK] [FILE]';
+		$this->out($message);
 	}
 }
 
