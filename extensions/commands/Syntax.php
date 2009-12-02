@@ -11,6 +11,7 @@ namespace app\extensions\commands;
 
 use lithium\core\Libraries;
 use lithium\util\Inflector;
+use lithium\util\String;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
@@ -22,6 +23,10 @@ class Syntax extends \lithium\console\Command {
 
 	public $exclude = '\.';
 
+	public $metrics;
+
+	public $blame;
+
 	public function run($file = null) {
 		if (!$this->checks) {
 			$this->help();
@@ -32,15 +37,17 @@ class Syntax extends \lithium\console\Command {
 		if (!$this->project) {
 			$this->project = $this->request->env['working'];
 		}
+		$this->project = realpath($this->project);
 
 		if ($file[0] !== '/') {
 			$file = $this->project . '/' . $file;
 		}
-		if (is_file($file)) {
-			return $this->_checkFile($file) ? 0 : 1;
-		}
-		return $this->_checkDirectory($file) ? 0 : 1;
+		$failures = is_file($file) ? $this->_checkFile($file) : $this->_checkDirectory($file);
 
+		if ($this->metrics) {
+			$this->_metrics($failures);
+		}
+		return $failures ? 1 : 0;
 	}
 
 	protected function _checkFile($file) {
@@ -63,17 +70,26 @@ class Syntax extends \lithium\console\Command {
 		$this->nl();
 
 		if ($failures) {
-			$this->error($failures);
+			foreach ($failures as &$failure) {
+				$failure['author'] = $this->_blame($failure);
+
+				$this->error(sprintf(
+					$this->blame ? '%1$4u| %2$3u| %3$20s| %4$s' : '%1$4u| %2$3u| %4$s',
+					$failure['line'] ?: '??',
+					$failure['column'] ?: '??',
+					$failure['author'] ?: '??',
+					$failure['message'] ?: '??'
+				));
+			}
 			$this->nl();
-			return false;
+			return $failures;
 		}
-		return true;
 	}
 
 	protected function _checkDirectory($directory) {
 		$base = new RecursiveDirectoryIterator($directory);
 		$iterator = new RecursiveIteratorIterator($base);
-		$errors = false;
+		$failures = array();
 
 		foreach ($iterator as $item) {
 			$basename = $item->getBasename();
@@ -82,9 +98,11 @@ class Syntax extends \lithium\console\Command {
 			if (preg_match('/\/' . $this->exclude . '/', $file) || $basename == 'empty') {
 				continue;
 			}
-			$errors = !$this->_checkFile($file) || $errors;
+			if ($result = $this->_checkFile($file)) {
+				$failures = array_merge($failures, $result);
+			}
 		}
-		return !$errors;
+		return $failures;
 	}
 
 	public function checks() {
@@ -100,8 +118,52 @@ class Syntax extends \lithium\console\Command {
 
 	public function help() {
 		$message  = 'Usage: li3 syntax [--project=PROJECT] [--exclude=REGEX] ';
-		$message .= '--checks=<CHECK>[,CHECK] [FILE]';
+		$message .= '[--metrics] [--blame] ';
+		$message .= '--checks=CHECK[,CHECK] [FILE]';
 		$this->out($message);
+	}
+
+	protected function _metrics($failures) {
+		$this->header('Failures by author and message');
+		$this->nl();
+		$byAuthor = array();
+
+		foreach ($failures as $failure) {
+			$byAuthor[$failure['author']][$failure['message']][] = $failure;
+		}
+		ksort($byAuthor);
+
+		foreach ($byAuthor as $author => $failures) {
+			if (!$author) {
+				continue;
+			}
+			$this->out($author);
+			ksort($failures);
+
+			foreach ($failures as $message => $messageFailures) {
+				$this->out(' - `' . $message . '` ('. count($messageFailures) .')');
+			}
+			$this->nl();
+		}
+	}
+
+	protected function _blame($failure) {
+		$backup = getcwd();
+		chdir($this->project);
+
+		$command = 'git blame -L{:start},{:end} --porcelain {:file}';
+		$replace = array(
+			'start' => $failure['line'],
+			'end' => $failure['line'] + 1,
+			'file' => $failure['file']
+		);
+		exec(String::insert($command, $replace), $output, $return);
+		chdir($backup);
+
+		if ($return == 0) {
+			list(, $author) = explode(' ', $output[1], 2);
+			return $author;
+		}
 	}
 }
 
