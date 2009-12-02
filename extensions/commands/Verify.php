@@ -63,7 +63,7 @@ class Verify extends \lithium\console\Command {
 		$this->nl();
 
 		if ($failures) {
-			$this->err($failures);
+			$this->error($failures);
 			$this->nl();
 			return false;
 		}
