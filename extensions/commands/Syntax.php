@@ -150,11 +150,12 @@ class Syntax extends \lithium\console\Command {
 	protected function _blame($failure) {
 		$backup = getcwd();
 		chdir($this->project);
+		$lines = count(file($failure['file']));
 
 		$command = 'git blame -L{:start},{:end} --porcelain {:file}';
 		$replace = array(
 			'start' => $failure['line'],
-			'end' => $failure['line'] + 1,
+			'end' => $lines == $failure['line'] ? $failure['line'] : $failure['line'] + 1,
 			'file' => $failure['file']
 		);
 		exec(String::insert($command, $replace), $output, $return);
