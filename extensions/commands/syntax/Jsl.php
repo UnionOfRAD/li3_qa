@@ -7,30 +7,31 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands\verify;
+namespace app\extensions\commands\syntax;
 
 use lithium\util\String;
 
-class Phpca extends \app\extensions\commands\verify\Base {
+class Jsl extends \app\extensions\commands\syntax\Base {
 
 	public function accepts($file) {
-		return file_exists($file) && preg_match('/\.php$/', $file);
+		return file_exists($file) && preg_match('/\.js$/', $file);
 	}
 
 	public function process($file) {
-		$plugin = dirname(dirname(dirname(__DIR__)));
-		$command = '{:php} {:phpca} -p {:php} --standard {:standard} {:file}';
+		$command = '{:jsl} -nologo -nosummary -nofilelisting -nocontext -process {:file}';
 		$replace = array(
-			'php' => trim(shell_exec('which php')),
-			'phpca' => $plugin . '/libraries/phpca/src/phpca.php',
-			'standard' => $plugin . '/config/phpca_lithium_standard.ini',
+			'jsl' => 'jsl',
 			'file' => $file
 		);
 		exec(String::insert($command, $replace), $output, $return);
 
-		if ($return != 0) {
-			return array_filter(array_slice($output, 9, -3));
+		if ($return != 3) {
+			return null;
 		}
+		return array_map(function($line) {
+			$line = preg_match('/\((?P<line>\d+)\)\:\s(?P<message>.*)/', $line, $matches);
+			return "{$matches['message']} on line {$matches['line']}";
+		}, $output);
 	}
 }
 

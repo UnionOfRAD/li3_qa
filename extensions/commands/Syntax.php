@@ -14,8 +14,7 @@ use lithium\util\Inflector;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
-
-class Verify extends \lithium\console\Command {
+class Syntax extends \lithium\console\Command {
 
 	public $checks;
 
@@ -38,18 +37,19 @@ class Verify extends \lithium\console\Command {
 			$file = $this->project . '/' . $file;
 		}
 		if (is_file($file)) {
-			return $this->_verifyFile($file) ? 0 : 1;
+			return $this->_checkFile($file) ? 0 : 1;
 		}
-		return $this->_verifyDirectory($file) ? 0 : 1;
+		return $this->_checkDirectory($file) ? 0 : 1;
 
 	}
 
-	protected function _verifyFile($file) {
-		$this->out('Verifying `'. str_replace($this->project . '/', null, $file) .'`. ', false);
+	protected function _checkFile($file) {
+		$message = 'Checking `' . str_replace($this->project . '/', null, $file) .'`. ';
+		$this->out($message, false);
 		$failures = array();
 
 		foreach ($this->checks as $check) {
-			$class = Libraries::locate('commands.verify', Inflector::camelize($check));
+			$class = Libraries::locate('commands.syntax', Inflector::camelize($check));
 			$check = new $class(array('request' => $this->request));
 
 			if (!$check->accepts($file)) {
@@ -70,7 +70,7 @@ class Verify extends \lithium\console\Command {
 		return true;
 	}
 
-	protected function _verifyDirectory($directory) {
+	protected function _checkDirectory($directory) {
 		$base = new RecursiveDirectoryIterator($directory);
 		$iterator = new RecursiveIteratorIterator($base);
 		$errors = false;
@@ -82,14 +82,14 @@ class Verify extends \lithium\console\Command {
 			if (preg_match('/\/' . $this->exclude . '/', $file) || $basename == 'empty') {
 				continue;
 			}
-			$errors = !$this->_verifyFile($file) || $errors;
+			$errors = !$this->_checkFile($file) || $errors;
 		}
 		return !$errors;
 	}
 
 	public function checks() {
 		$this->header('Available Checks:');
-		$classes = array_unique(Libraries::locate('commands.verify', null, array(
+		$classes = array_unique(Libraries::locate('commands.syntax', null, array(
 			'recursive' => false
 		)));
 		foreach ($classes as $command) {
@@ -99,7 +99,7 @@ class Verify extends \lithium\console\Command {
 	}
 
 	public function help() {
-		$message  = 'Usage: li3 verify [--project=PROJECT] [--exclude=REGEX] ';
+		$message  = 'Usage: li3 syntax [--project=PROJECT] [--exclude=REGEX] ';
 		$message .= '--checks=<CHECK>[,CHECK] [FILE]';
 		$this->out($message);
 	}

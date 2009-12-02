@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands\verify;
+namespace app\extensions\commands\syntax;
 
 /**
  * This is the base class all verification commands need to extend.
@@ -15,7 +15,7 @@ namespace app\extensions\commands\verify;
 abstract class Base extends \lithium\console\Command {
 
 	/**
-	 * Checks if given file can be verified.
+	 * Checks if given file can be checked.
 	 *
 	 * @param string $file Absolute path to file.
 	 * @return boolean
@@ -23,7 +23,7 @@ abstract class Base extends \lithium\console\Command {
 	abstract public function accepts($file);
 
 	/**
-	 * Process a file by verifying it's contents.
+	 * Process a file by checking it's contents.
 	 *
 	 * @param string $file Absolute path to file.
 	 * @return array|boolean|void `false` if file cannot be processed or - if applicable -
