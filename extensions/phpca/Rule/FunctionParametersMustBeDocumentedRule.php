@@ -18,6 +18,13 @@ class FunctionParametersMustBeDocumentedRule extends Rule
             $function = $this->file->current();
             $signature = array();
 
+            // Skip anonymous functions
+            $this->file->next();
+
+            if ($this->file->current()->getId() != T_WHITESPACE) {
+                continue;
+            }
+
             while ($this->file->current()->getId() != T_OPEN_CURLY) {
                 $this->file->next();
                 $token = $this->file->current();
