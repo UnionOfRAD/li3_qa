@@ -16,7 +16,7 @@ class OneClassPerFileRule extends Rule
     {
         $count = 0;
 
-		while ($this->file->seekTokenId(T_CLASS)) {
+        while ($this->file->seekTokenId(T_CLASS)) {
             $count++;
             $token = $this->file->current();
 
@@ -27,6 +27,6 @@ class OneClassPerFileRule extends Rule
             $this->file->seekToken($token);
             $this->file->next();
         }
-	}
+    }
 }
 ?>

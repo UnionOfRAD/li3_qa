@@ -15,17 +15,17 @@ class MaximumLineLengthRule extends Rule
      * @returns null
      */
     protected function doCheck()
-	{
-		$lines = explode(
-			stripcslashes($this->configuration->getLineEndings()),
-			$this->file->getSourceCode()
-		);
-		foreach ($lines as $i => $line) {
-			if (strlen($line) > $this->settings['line_length']) {
-				$token = new Token(T_ANY, $line, $i + 1, $this->settings['line_length'] + 1);
-				$this->addViolation('Maximum line length exceeded', $token);
-			}
-		}
-	}
+    {
+        $lines = explode(
+            stripcslashes($this->configuration->getLineEndings()),
+            $this->file->getSourceCode()
+        );
+        foreach ($lines as $i => $line) {
+            if (strlen($line) > $this->settings['line_length']) {
+                $token = new Token(T_ANY, $line, $i + 1, $this->settings['line_length'] + 1);
+                $this->addViolation('Maximum line length exceeded', $token);
+            }
+        }
+    }
 }
 ?>
