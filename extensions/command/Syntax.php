@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands;
+namespace app\extensions\command;
 
 use lithium\core\Libraries;
 use lithium\util\Inflector;
@@ -62,7 +62,7 @@ class Syntax extends \lithium\console\Command {
 		$failures = array();
 
 		foreach ($this->checks as $check) {
-			$class = Libraries::locate('commands.syntax', Inflector::camelize($check));
+			$class = Libraries::locate('command.syntax', Inflector::camelize($check));
 			$check = new $class(array('request' => $this->request));
 
 			if (!$check->accepts($file)) {
@@ -112,7 +112,7 @@ class Syntax extends \lithium\console\Command {
 
 	public function checks() {
 		$this->header('Available Checks:');
-		$classes = array_unique(Libraries::locate('commands.syntax', null, array(
+		$classes = array_unique(Libraries::locate('command.syntax', null, array(
 			'recursive' => false
 		)));
 		foreach ($classes as $command) {

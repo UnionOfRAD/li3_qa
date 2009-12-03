@@ -7,10 +7,10 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands\syntax;
+namespace app\extensions\command\syntax;
 
 /**
- * This is the base class all verification commands need to extend.
+ * This is the base class all verification command need to extend.
  */
 abstract class Base extends \lithium\console\Command {
 

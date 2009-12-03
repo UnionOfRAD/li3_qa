@@ -7,11 +7,11 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands\syntax;
+namespace app\extensions\command\syntax;
 
 use lithium\util\String;
 
-class Phpl extends \app\extensions\commands\syntax\Base {
+class Phpl extends \app\extensions\command\syntax\Base {
 
 	public function accepts($file) {
 		return file_exists($file) && preg_match('/\.php$/', $file);

@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\commands;
+namespace app\extensions\command;
 
 /**
  * When pushing a new version, cleans up all local version-dependent feature branches which are
