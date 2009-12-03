@@ -32,7 +32,7 @@ class Phpca extends \app\extensions\command\syntax\Base {
 			return null;
 		}
 		$format = function($line) use ($file) {
-			$regex = '/(?P<line>\d+)\|.*(?P<column>\d+)\|\s+(?P<message>.*)/';
+			$regex = '/(?P<line>\d+)\|\s*(?P<column>\d+)\|\s+(?P<message>.*)/';
 			preg_match($regex, $line, $matches);
 
 			return array(
