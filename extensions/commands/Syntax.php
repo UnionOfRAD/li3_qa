@@ -27,6 +27,8 @@ class Syntax extends \lithium\console\Command {
 
 	public $blame;
 
+	protected $_vcs;
+
 	public function run($file = null) {
 		if (!$this->checks) {
 			$this->help();
@@ -38,6 +40,10 @@ class Syntax extends \lithium\console\Command {
 			$this->project = $this->request->env['working'];
 		}
 		$this->project = realpath($this->project);
+
+		if (is_dir($this->project . '/.git')) {
+			$this->_vcs = 'git';
+		}
 
 		if ($file[0] !== '/') {
 			$file = $this->project . '/' . $file;
@@ -148,6 +154,9 @@ class Syntax extends \lithium\console\Command {
 	}
 
 	protected function _blame($failure) {
+		if (!$this->_vcs == 'git') {
+			return null;
+		}
 		$backup = getcwd();
 		chdir($this->project);
 		$lines = count(file($failure['file']));
