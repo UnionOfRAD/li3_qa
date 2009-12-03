@@ -78,7 +78,6 @@ class Syntax extends \lithium\console\Command {
 		if ($failures) {
 			foreach ($failures as &$failure) {
 				$failure['author'] = $this->_blame($failure);
-
 				$this->error(sprintf(
 					$this->blame ? '%1$4u| %2$3u| %3$20s| %4$s' : '%1$4u| %2$3u| %4$s',
 					$failure['line'] ?: '??',

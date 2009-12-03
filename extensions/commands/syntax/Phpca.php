@@ -29,11 +29,9 @@ class Phpca extends \app\extensions\commands\syntax\Base {
 		exec(String::insert($command, $replace), $output, $return);
 
 		if ($return == 0) {
-			return;
+			return null;
 		}
-		$output = array_filter(array_slice($output, 9, -3));
-
-		return array_map(function($line) use ($file) {
+		$format = function($line) use ($file) {
 			$regex = '/(?P<line>\d+)\|.*(?P<column>\d+)\|\s+(?P<message>.*)/';
 			preg_match($regex, $line, $matches);
 
@@ -43,8 +41,8 @@ class Phpca extends \app\extensions\commands\syntax\Base {
 				'column' => isset($matches['column']) ? $matches['column'] : null,
 				'message' => isset($matches['message']) ? $matches['message'] : null
 			);
-		}, $output);
-
+		};
+		return array_map($format, array_filter(array_slice($output, 9, -3)));
 	}
 }
 

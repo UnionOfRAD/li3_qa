@@ -25,11 +25,23 @@ class Phpl extends \app\extensions\commands\syntax\Base {
 		);
 		exec(String::insert($command, $replace), $output, $return);
 
-		if ($return != 0) {
-			return array_filter($output, function($error) {
-				return !empty($error) && $error[0] == 'P';
-			});
+		if ($return == 0) {
+			return null;
 		}
+		$filter = function($failure) {
+			return !empty($failure) && $failure[0] == 'P';
+		};
+		$format = function($line) use ($file) {
+			$regex = '/(?P<message>.*)\sin\s(?P<file>.*)\son\sline\s(?P<line>\d+)/';
+			preg_match($regex, $line, $matches);
+			return array(
+				'file' => $file,
+				'line' => isset($matches['line']) ? $matches['line'] : null,
+				'column' => null,
+				'message' => isset($matches['message']) ? $matches['message'] : null
+			);
+		};
+		return array_map($format, array_filter($output, $filter));
 	}
 }
 

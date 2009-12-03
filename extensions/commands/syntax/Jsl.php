@@ -28,10 +28,17 @@ class Jsl extends \app\extensions\commands\syntax\Base {
 		if ($return != 3) {
 			return null;
 		}
-		return array_map(function($line) {
-			$line = preg_match('/\((?P<line>\d+)\)\:\s(?P<message>.*)/', $line, $matches);
-			return "{$matches['message']} on line {$matches['line']}";
-		}, $output);
+		$format = function($line) use ($file) {
+			$regex = '/\((?P<line>\d+)\)\:\s(?P<message>.*)/';
+			preg_match($regex, $line, $matches);
+			return array(
+				'file' => $file,
+				'line' => isset($matches['line']) ? $matches['line'] : null,
+				'column' => null,
+				'message' => isset($matches['message']) ? $matches['message'] : null
+			);
+		};
+		return array_map($format, $output);
 	}
 }
 
