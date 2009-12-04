@@ -15,19 +15,42 @@ use lithium\util\String;
 use \RecursiveIteratorIterator;
 use \RecursiveDirectoryIterator;
 
+/**
+ * Runs syntax checks against files.
+ */
 class Syntax extends \lithium\console\Command {
 
+	/**
+	 * Comma-separated list of checks to use.
+	 *
+	 * @var string
+	 */
 	public $checks;
 
-	public $project;
-
+	/**
+	 * A regex to exclude paths from being checked.
+	 *
+	 * @var string Regular expression.
+	 */
 	public $exclude = '\.';
 
+	/**
+	 * Enable output of metrics.
+	 *
+	 * @var boolean
+	 */
 	public $metrics;
 
+	/**
+	 * Enable blaming of each failure.
+	 *
+	 * @var boolean
+	 */
 	public $blame;
 
 	protected $_vcs;
+
+	public $project;
 
 	public function run($file = null) {
 		if (!$this->checks) {
@@ -119,13 +142,6 @@ class Syntax extends \lithium\console\Command {
             $command = explode('\\', $command);
             $this->out(' - ' . Inflector::underscore(array_pop($command)));
 		}
-	}
-
-	public function help() {
-		$message  = 'Usage: li3 syntax [--project=PROJECT] [--exclude=REGEX] ';
-		$message .= '[--metrics] [--blame] ';
-		$message .= '--checks=CHECK[,CHECK] [FILE]';
-		$this->out($message);
 	}
 
 	protected function _metrics($failures) {
