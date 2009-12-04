@@ -57,7 +57,7 @@ class Syntax extends \lithium\console\Command {
 	}
 
 	protected function _checkFile($file) {
-		$message = 'Checking `' . str_replace($this->project . '/', null, $file) .'`. ';
+		$message = 'Checking syntax of `' . str_replace($this->project . '/', null, $file) .'`. ';
 		$this->out($message, false);
 		$failures = array();
 
@@ -129,8 +129,9 @@ class Syntax extends \lithium\console\Command {
 	}
 
 	protected function _metrics($failures) {
-		$this->header('Failures by author and message');
+		$this->header('Metrics');
 		$this->nl();
+		$total = count($failures);
 		$byAuthor = array();
 
 		foreach ($failures as $failure) {
@@ -150,6 +151,9 @@ class Syntax extends \lithium\console\Command {
 			}
 			$this->nl();
 		}
+		$this->nl();
+		$this->out("Total: {$total}");
+		$this->nl();
 	}
 
 	protected function _blame($failure) {
