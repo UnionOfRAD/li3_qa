@@ -13,7 +13,7 @@ namespace app\extensions\command;
  * When pushing a new version, cleans up all local version-dependent feature branches which are
  * based on the existing version, and re-clones them based on the new version. For example:
  *
- * {{{li3 branch_upgrade --project=/path/to 1.5 1.6}}}
+ * {{{li3 branch_upgrade /path/to/project 1.5 1.6}}}
  *
  * Given the local branch `data`, cloned from `origin/1.5-data`, the `data` branch will be dropped
  * and re-checked-out from `origin/1.6-data`.
@@ -23,20 +23,20 @@ namespace app\extensions\command;
  */
 class BranchUpgrade extends \lithium\console\Command {
 
-	public $project;
-
-	public function run() {
-		if (count($this->request->params['passed']) < 2) {
-			$this->_stop();
+	public function run($path) {
+		if (count($this->request->params['passed']) < 3) {
+			$this->error('Not enough arguments given.');
+			return false;
 		}
-		if (!$this->project) {
-			$this->project = $this->request->env['working'];
+		if (!$path = realpath($path) || !is_dir($path)) {
+			$this->error('Not a valid path to a project directory.');
+			return false;
 		}
 		list($old, $new) = $this->request->params['passed'];
 		$locals = $remotes = $trackings = array();
 		$current = null;
 
-		chdir($this->project);
+		chdir($path);
 		`git pull origin`;
 		`git remote prune origin`;
 

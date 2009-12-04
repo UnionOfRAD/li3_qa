@@ -25,7 +25,7 @@ class Syntax extends \lithium\console\Command {
 	 *
 	 * @var string
 	 */
-	public $checks;
+	public $checks = 'phpca';
 
 	/**
 	 * A regex to exclude paths from being checked.
@@ -48,39 +48,57 @@ class Syntax extends \lithium\console\Command {
 	 */
 	public $blame;
 
+	protected $_project;
+
 	protected $_vcs;
 
-	public $project;
-
-	public function run($file = null) {
-		if (!$this->checks) {
-			$this->help();
-			return 1;
-		}
+	/**
+	 * Main method.
+	 *
+	 * @param string $path Absolute path to file or directory.
+	 */
+	public function run($path) {
 		$this->checks = explode(',' , $this->checks);
 
-		if (!$this->project) {
-			$this->project = $this->request->env['working'];
+		if (!$path = realpath($path)) {
+			$this->error('Not a valid path.');
+			return false;
 		}
-		$this->project = realpath($this->project);
-
-		if (is_dir($this->project . '/.git')) {
+		if (!$this->_project = $this->_project($path)) {
+			$this->error('Not a valid project.');
+			return false;
+		}
+		if (is_dir($this->_project . '/.git')) {
 			$this->_vcs = 'git';
 		}
-
-		if ($file[0] !== '/') {
-			$file = $this->project . '/' . $file;
-		}
-		$failures = is_file($file) ? $this->_checkFile($file) : $this->_checkDirectory($file);
+		$failures = is_file($path) ? $this->_checkFile($path) : $this->_checkDirectory($path);
 
 		if ($this->metrics) {
 			$this->_metrics($failures);
 		}
-		return $failures ? 1 : 0;
+		return !$failures;
+	}
+
+	public function checks() {
+		$this->header('Available Checks:');
+		$classes = array_unique(Libraries::locate('command.syntax', null, array(
+			'recursive' => false
+		)));
+		foreach ($classes as $command) {
+            $command = explode('\\', $command);
+            $this->out(' - ' . Inflector::underscore(array_pop($command)));
+		}
+	}
+
+	protected function _project($path) {
+		while ($path && !is_dir($path . '/.git') && !is_dir($path . '/config/bootstrap.php')) {
+			$path = ($parent = dirname($path)) != $path ? $parent : false;
+		}
+		return $path;
 	}
 
 	protected function _checkFile($file) {
-		$message = 'Checking syntax of `' . str_replace($this->project . '/', null, $file) .'`. ';
+		$message = 'Checking syntax of `' . str_replace($this->_project . '/', null, $file) .'`. ';
 		$this->out($message, false);
 		$failures = array();
 
@@ -133,17 +151,6 @@ class Syntax extends \lithium\console\Command {
 		return $failures;
 	}
 
-	public function checks() {
-		$this->header('Available Checks:');
-		$classes = array_unique(Libraries::locate('command.syntax', null, array(
-			'recursive' => false
-		)));
-		foreach ($classes as $command) {
-            $command = explode('\\', $command);
-            $this->out(' - ' . Inflector::underscore(array_pop($command)));
-		}
-	}
-
 	protected function _metrics($failures) {
 		$this->header('Metrics');
 		$this->nl();
@@ -177,7 +184,7 @@ class Syntax extends \lithium\console\Command {
 			return null;
 		}
 		$backup = getcwd();
-		chdir($this->project);
+		chdir($this->_project);
 		$lines = count(file($failure['file']));
 
 		$command = 'git blame -L{:start},{:end} --porcelain {:file}';
