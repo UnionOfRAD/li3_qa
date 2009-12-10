@@ -21,8 +21,7 @@ class NoShortTypeNamesRule extends Rule
         foreach ($enforce as $id => $text) {
             while ($this->file->seekTokenId($id)) {
                 $token = $this->file->current();
-
-                if ($token->getText() !== $text) {
+                if (strpos($token->getText(), $text) === false) {
                     $this->addViolation('Short type name', $token);
                 }
                 $this->file->next();
