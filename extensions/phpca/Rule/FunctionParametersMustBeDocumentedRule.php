@@ -27,7 +27,12 @@ class FunctionParametersMustBeDocumentedRule extends Rule
 
             while ($this->file->current()->getId() != T_OPEN_CURLY) {
                 $this->file->next();
+
+				if (!$this->file->valid()) {
+					break;
+				}
                 $token = $this->file->current();
+
 
                 if ($token->getId() == T_VARIABLE) {
                     $signature[] = $token;
