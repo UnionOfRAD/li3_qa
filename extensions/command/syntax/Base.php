@@ -30,6 +30,24 @@ abstract class Base extends \lithium\console\Command {
 	 *                             an array of violation messages.
 	 */
 	abstract public function process($file);
+
+	protected function _which($command) {
+		if (substr(PHP_OS, 0, 3) != 'WIN') {
+			return trim(shell_exec('which php'));
+		}
+		$extensions = array('.exe', '.bat', '.cmd', '.com', '');
+		$paths = explode(PATH_SEPARATOR, $this->request->env('PATH'));
+
+		foreach ($paths as $path) {
+			foreach ($extensions as $extension) {
+				$file = "{$path}\\{$command}{$extension}";
+
+				if (is_file($file)) {
+					return $file;
+				}
+			}
+		}
+	}
 }
 
 ?>

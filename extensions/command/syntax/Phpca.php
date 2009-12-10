@@ -21,7 +21,7 @@ class Phpca extends \app\extensions\command\syntax\Base {
 		$plugin = dirname(dirname(dirname(__DIR__)));
 		$command = '{:php} {:phpca} -p {:php} --standard {:standard} {:file}';
 		$replace = array(
-			'php' => trim(shell_exec('which php')),
+			'php' => $this->_which('php'),
 			'phpca' => $plugin . '/libraries/phpca/src/phpca.php',
 			'standard' => $plugin . '/config/phpca_lithium_standard.ini',
 			'file' => $file
