@@ -3,9 +3,9 @@
 namespace spriebsch\PHPca\Rule;
 
 /**
- * Ensures that there are no whitespaces after or within a cast.
+ * Ensures that there are no whitespaces within a cast.
  */
-class TightCastRule extends Rule
+class NoWhitespaceWithinCastRule extends Rule
 {
     /**
      * Performs the rule check.
@@ -25,13 +25,7 @@ class TightCastRule extends Rule
                 if ($token->hasWhitespace()) {
                     $this->addViolation('Whitespace whithin cast', $token);
                 }
-
                 $this->file->next();
-                $token = $this->file->current();
-
-                if ($token->getId() === T_WHITESPACE) {
-                    $this->addViolation('Whitespace after cast', $token);
-                }
             }
         }
     }
