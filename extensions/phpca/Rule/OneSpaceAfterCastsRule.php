@@ -3,9 +3,9 @@
 namespace spriebsch\PHPca\Rule;
 
 /**
- * Ensures that there are no whitespaces within a cast.
+ * Ensures that there is one space after a cast.
  */
-class NoWhitespaceWithinCastRule extends Rule
+class OneSpaceAfterCastsRule extends Rule
 {
     /**
      * Performs the rule check.
@@ -20,12 +20,14 @@ class NoWhitespaceWithinCastRule extends Rule
         );
         foreach ($casts as $id) {
             while ($this->file->seekTokenId($id)) {
+                $this->file->next();
                 $token = $this->file->current();
 
-                if ($token->hasWhitespace()) {
-                    $this->addViolation('Whitespace whithin cast', $token);
+                if ($token->getId() !== T_WHITESPACE) {
+                    $this->addViolation('No space after cast', $token);
+                } elseif (strlen($token->getText()) > 1) {
+                    $this->addViolation('More than one space after cast', $token);
                 }
-                $this->file->next();
             }
         }
     }
