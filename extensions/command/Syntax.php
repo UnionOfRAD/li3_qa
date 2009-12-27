@@ -62,7 +62,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 
 		$config = new Configuration(getcwd());
 		$config->setStandard(parse_ini_file($file, true));
-		// $config->setConfiguration(array());
+		$config->setConfiguration(array());
 
 		$php = PHP_BINDIR . '/' . (substr(PHP_OS, 0, 3) == 'WIN' ? 'php.exe' : 'php');
 		$result = $app->run($php, $path, $config);
