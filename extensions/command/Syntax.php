@@ -74,13 +74,12 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	}
 
 	public function showProgress($file, Result $result, Application $application) {
-		$message = 'Syntax check of `' . str_replace($this->_project . '/', null, $file) .'`: ';
-		$this->out($message, false);
+		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) .'`';
 
 		if ($result->wasSkipped($file)) {
-			$this->out('Skipped');
+			$this->out("[Skipped] {$message}");
 		} elseif ($result->hasLintError($file)) {
-			$this->out('Error');
+			$this->out("[Error  ] {$message}");
 			$error = $result->getLintError($file);
 			$this->out(sprintf(
 				$this->blame ? '%1$4u| %2$3u| %3$20s| %4$s' : '%1$4u| %2$3u| %4$s',
@@ -91,10 +90,10 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 			));
 
 		} elseif ($result->hasRuleError($file)) {
-			$this->out('Error');
+			$this->out("[Error  ] {$message}");
 
 		} elseif ($result->hasViolations($file)) {
-			$this->out('Failed');
+			$this->out("[Failed ] {$message}");
 
 			foreach ($result->getViolations($file) as $violation) {
 				$this->out(sprintf(
@@ -106,7 +105,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 				));
 			}
 		} else {
-			$this->out('Passed');
+			$this->out("[Passed ] {$message}");
 		}
 	}
 
