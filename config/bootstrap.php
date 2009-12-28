@@ -66,16 +66,14 @@ Libraries::add('app', array('bootstrap' => false));
 /**
  * Add libraries from submodules.
  */
-
-require LITHIUM_APP_PATH . '/libraries/phpca/src/Exceptions.php';
-require LITHIUM_APP_PATH . '/libraries/phpca/src/Loader.php';
-
-\spriebsch\PHPca\Loader::registerPath(LITHIUM_APP_PATH . '/libraries/phpca/src');
-
-Libraries::add('phpca', array(
+Libraries::add('PHPca', array(
+	'prefix' => 'spriebsch\\PHPca\\',
 	'path' => dirname(__DIR__) . '/libraries/phpca/src',
-	'loader' => array('\spriebsch\PHPca\Loader', 'autoload')
+	'transform' => function($class, $params) {
+		static $_classMap;
+		require_once "{$params['path']}/_ClassMap.php";
+		return "{$params['path']}/{$_classMap[$class]}";
+	}
 ));
-
 
 ?>
