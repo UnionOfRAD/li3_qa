@@ -66,7 +66,7 @@ Libraries::add('app', array('bootstrap' => false));
 /**
  * Add libraries from submodules.
  */
-Libraries::add('PHPca', array(
+Libraries::add('phpca', array(
 	'prefix' => 'spriebsch\\PHPca\\',
 	'path' => dirname(__DIR__) . '/libraries/phpca/src',
 	'transform' => function($class, $params) {
