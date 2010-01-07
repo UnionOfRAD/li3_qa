@@ -65,7 +65,13 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		$config->setConfiguration(array());
 
 		$php = PHP_BINDIR . '/' . (substr(PHP_OS, 0, 3) == 'WIN' ? 'php.exe' : 'php');
-		$result = $app->run($php, $path, $config);
+
+		try {
+			$result = $app->run($php, $path, $config);
+		} catch (\Exception $e) {
+			$this->error($message = $e->getMessage());
+			return $message == 'No PHP files to analyze';
+		}
 
 		if ($this->metrics) {
 			$this->_metrics($result);
