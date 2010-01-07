@@ -72,6 +72,7 @@ Libraries::add('phpca', array(
 	'transform' => function($class, $params) {
 		static $_classMap;
 		require_once "{$params['path']}/_ClassMap.php";
+		require_once "{$params['path']}/Exceptions.php";
 		return "{$params['path']}/{$_classMap[$class]}";
 	}
 ));
