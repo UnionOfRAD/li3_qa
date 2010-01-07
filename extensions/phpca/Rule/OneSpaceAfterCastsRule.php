@@ -15,7 +15,7 @@ class OneSpaceAfterCastsRule extends Rule
     protected function doCheck()
     {
         $casts = array(
-            T_BOOL_CAST, T_INT_CAST, T_ARRAY_CAST,
+            T_BOOL_CAST, T_INT_CAST, T_ARRAY_CAST, T_STRING_CAST,
             T_DOUBLE_CAST, T_OBJECT_CAST, T_UNSET_CAST
         );
         foreach ($casts as $id) {
