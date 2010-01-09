@@ -33,6 +33,13 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 */
 	public $blame;
 
+	/**
+	 * Absolute path to PHP executable (optional for most environments).
+	 *
+	 * @var string
+	 */
+	public $php;
+
 	protected $_project;
 
 	protected $_vcs;
@@ -64,10 +71,18 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		$config->setStandard(parse_ini_file($file, true));
 		$config->setConfiguration(array());
 
-		$php = PHP_BINDIR . '/' . (substr(PHP_OS, 0, 3) == 'WIN' ? 'php.exe' : 'php');
+		if (!isset($this->php)) {
+			$this->php = PHP_BINDIR . '/' . (substr(PHP_OS, 0, 3) == 'WIN' ? 'php.exe' : 'php');
+		}
+		if (!file_exists($this->php)) {
+			$message  = 'You must specify a valid absolute path to a PHP executable. ';
+			$message .= 'Try using `li3 syntax --php=PATH ...`.';
+			$this->error($message);
+			return false;
+		}
 
 		try {
-			$result = $app->run($php, $path, $config);
+			$result = $app->run($this->php, $path, $config);
 		} catch (\Exception $e) {
 			$this->error($message = $e->getMessage());
 			return $message == 'No PHP files to analyze';
