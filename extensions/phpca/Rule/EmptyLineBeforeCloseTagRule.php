@@ -10,21 +10,26 @@ class EmptyLineBeforeCloseTagRule extends Rule
     /**
      * Performs the rule check.
      *
+     * We need to check 2 tokens previous to the closing tag otherwise a comment followed by
+     * and empty line followed by the closing tag is not properly recognized.
+     *
      * @returns null
      */
     protected function doCheck()
     {
         $this->file->seekTokenId(T_CLOSE_TAG);
-        $this->file->prev();
-        $token = $this->file->current();
 
-        if (!$token) {
-            return null;
-        }
+        $this->file->prev();
+        $b = $this->file->current();
+
+        $this->file->prev();
+        $a = $this->file->current();
+
+        $string = $a->getText() . $b->getText();
         $lineEndings = $this->configuration->getLineEndings();
 
-        if (addcslashes($token->getText(), "\0..\37") != $lineEndings . $lineEndings) {
-            $this->addViolation('File has no empty line before PHP close tag', $token);
+        if (!preg_match("/{$lineEndings}{$lineEndings}$/", $string)) {
+            $this->addViolation('File has no empty line before PHP close tag', $b);
         }
     }
 }
