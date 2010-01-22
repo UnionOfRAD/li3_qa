@@ -25,6 +25,10 @@ class EmptyLineBeforeCloseTagRule extends Rule
         $this->file->prev();
         $a = $this->file->current();
 
+        if (!$a || !$b) {
+            return;
+        }
+
         $string = $a->getText() . $b->getText();
         $lineEndings = $this->configuration->getLineEndings();
 
