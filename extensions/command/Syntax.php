@@ -95,7 +95,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	}
 
 	public function showProgress($file, Result $result, Application $application) {
-		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) .'`';
+		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) . '`';
 
 		if ($result->wasSkipped($file)) {
 			$this->out("[Skipped] {$message}");
