@@ -5,7 +5,7 @@ namespace spriebsch\PHPca\Rule;
 use spriebsch\PHPca\Token;
 
 /**
- * Ensures all constants are uppercase
+ * Ensures documentation Tags are ordered properly
  */
 class DocTagsOrderRule extends Rule {
 
@@ -24,24 +24,30 @@ class DocTagsOrderRule extends Rule {
 	protected function doCheck() {
 		while ($this->file->seekTokenId(T_DOC_COMMENT)) {
 			$token = $this->file->current();
-
 			$docText = $token->getText();
 
+			//Grab ordered array of the tags in this token
 			$docTags = array();
-
 			preg_match_all('/@.*?\s/', $docText, $docTags);
+			$docTags = array_shift($docTags);
 
 			$docIndex = 0;
-			foreach ($this->tagsOrdered as $tag) {
-				$tagIndex = array_search($tag . " ", $docTags[0]);
+			$lastTag = "";
+			foreach ($docTags as $tag) {
+				$tag = trim($tag);
+				$tagIndex = array_search($tag, $this->tagsOrdered);
+
 				if ($tagIndex !== false) {
 					if ($tagIndex < $docIndex) {
-						$this->addViolation("Doc tags not ordered correctly", $token);
-						//Break so there is only one violation per code block
-						break;
+						$this->addViolation(
+							"Doc tag `" . $tag . "` not ordered correctly, came after `" . $lastTag . "`",
+							$token
+						);
+						continue;
 					}
 
 					$docIndex = $tagIndex;
+					$lastTag = $tag;
 				}
 
 			}
