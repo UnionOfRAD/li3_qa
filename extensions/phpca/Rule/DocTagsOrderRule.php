@@ -9,6 +9,13 @@ use spriebsch\PHPca\Token;
  */
 class DocTagsOrderRule extends Rule {
 
+	/**
+	 * List of possible tags, ordered
+	 *
+	 * All tags will be referenced against this list. If they
+	 * appear out of order, a violation will be raised. Simple
+	 * order check regardless of missing tags.
+	 */
 	protected $tagsOrdered = array (
 		"@link",
 		"@see",
