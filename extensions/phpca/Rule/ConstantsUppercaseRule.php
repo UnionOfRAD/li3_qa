@@ -5,15 +5,17 @@ namespace spriebsch\PHPca\Rule;
 use spriebsch\PHPca\Token;
 
 /**
- * Ensures that Constants are upper case
+ * Ensures that constants are upper case.
  */
-class ConstantsUppercaseRule extends Rule {
+class ConstantsUppercaseRule extends Rule
+{
     /**
      * Performs the rule check.
      *
      * @returns null
      */
-    public function doCheck() {
+    public function doCheck()
+    {
         $source = $this->file->getSourceCode();
 
         $namedConstants = array();
@@ -24,20 +26,20 @@ class ConstantsUppercaseRule extends Rule {
         $declarations = array_shift($namedConstants);
         $namedConstants = array_shift($namedConstants);
 
-        foreach($namedConstants as $i => $const) {
-            if($const != strtoupper($const)) {
+        foreach($namedConstants as $i => $constant) {
+            if ($constant != strtoupper($constant)) {
                 $lines = array();
                 $line = preg_match_all(
                     '/.*?' . $this->configuration->getLineEndings() . '.*?/',
-                    substr($source, 0, strpos($source, 'define("' . $const)),
+                    substr($source, 0, strpos($source, 'define("' . $constant)),
                     $lines
                 );
 
                 $this->addViolation(
-                    "Named Constant `" . $const . "` not upper case",
+                    "Named Constant `{$constant}` not upper case",
                     null,
                     $line + 1,
-                    strpos($declarations[$i], $const)
+                    strpos($declarations[$i], $constant)
                 );
             }
         }
