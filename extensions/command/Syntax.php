@@ -93,7 +93,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		try {
 			$result = $app->run($this->php, $path, $config);
 		} catch (\Exception $e) {
-			$this->error($message = $e->getMessage());
+			$this->out($message = $e->getMessage());
 			return $message == 'No PHP files to analyze';
 		}
 
