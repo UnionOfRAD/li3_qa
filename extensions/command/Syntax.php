@@ -88,6 +88,8 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 			return false;
 		}
 
+		$begin = microtime(true);
+
 		try {
 			$result = $app->run($this->php, $path, $config);
 		} catch (\Exception $e) {
@@ -96,7 +98,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		}
 
 		if ($this->metrics) {
-			$this->_metrics($result);
+			$this->_metrics($result, microtime(true) - $begin);
 		}
 		return !$result->hasErrors();
 	}
@@ -144,9 +146,11 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		return $path;
 	}
 
-	protected function _metrics($result) {
+	protected function _metrics($result, $took) {
 		$this->nl();
 		$this->header('Metrics');
+		$this->nl();
+		$this->out(sprintf("Took: %.2ds", $took));
 		$this->nl();
 		$this->out('Files: ' . $result->getNumberOfFiles());
 		$this->out('Skipped: ' . $result->getNumberOfSkippedFiles());
