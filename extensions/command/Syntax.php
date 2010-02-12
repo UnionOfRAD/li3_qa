@@ -40,13 +40,6 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 */
 	public $php;
 
-	/**
-	 * Enables verbose output.
-	 *
-	 * @var boolean
-	 */
-	public $v;
-
 	protected $_project;
 
 	protected $_vcs;
@@ -106,7 +99,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	public function showProgress($file, Result $result, Application $application) {
 		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) . '`';
 
-		if ($result->wasSkipped($file) && $this->v) {
+		if ($result->wasSkipped($file)) {
 			$this->out("[Skipped] {$message}");
 		} elseif ($result->hasLintError($file)) {
 			$this->out("[Error  ] {$message}");
@@ -134,7 +127,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 					$violation->getMessage() ?: '??'
 				));
 			}
-		} elseif ($this->v) {
+		} else {
 			$this->out("[Passed ] {$message}");
 		}
 	}
