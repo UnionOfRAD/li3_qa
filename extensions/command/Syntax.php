@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace app\extensions\command;
+namespace lithium_qa\extensions\command;
 
 use lithium\util\String;
 use spriebsch\PHPca\Application;
