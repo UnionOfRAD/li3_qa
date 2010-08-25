@@ -49,7 +49,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 *
 	 * @param string $path Absolute path to file or directory.
 	 */
-	public function run($path) {
+	public function run($path = '.') {
 		if (!$path = realpath($path)) {
 			$this->error('Not a valid path.');
 			return false;
