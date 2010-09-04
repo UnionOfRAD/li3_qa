@@ -50,12 +50,7 @@ if (!Libraries::get('lithium_qa')) {
 Libraries::add('phpca', array(
 	'prefix' => 'spriebsch\\PHPca\\',
 	'path' => dirname(__DIR__) . '/libraries/phpca/src',
-	'transform' => function($class, $params) {
-		static $_classMap;
-		require_once "{$params['path']}/_ClassMap.php";
-		require_once "{$params['path']}/Exceptions.php";
-		return "{$params['path']}/{$_classMap[$class]}";
-	}
+	'bootstrap' => 'Autoload.php'
 ));
 
 ?>
