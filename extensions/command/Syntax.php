@@ -29,14 +29,14 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 *
 	 * @var boolean
 	 */
-	public $metrics;
+	public $metrics = false;
 
 	/**
 	 * Enable blaming of each failure.
 	 *
 	 * @var boolean
 	 */
-	public $blame;
+	public $blame = false;
 
 	/**
 	 * Absolute path to PHP executable (optional for most environments).
