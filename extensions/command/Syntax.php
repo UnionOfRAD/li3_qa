@@ -15,7 +15,12 @@ use spriebsch\PHPca\Configuration;
 use spriebsch\PHPca\Result;
 
 /**
- * Runs syntax checks against files.
+ * Runs syntax checks against files. This will validate
+ * against the Lithium coding, documentation and testing standards.
+ *
+ * @link http://dev.lithify.me/lithium/wiki/standards/coding
+ * @link http://dev.lithify.me/lithium/wiki/standards/documenting
+ * @link http://dev.lithify.me/lithium/wiki/standards/testing
  */
 class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\ProgressPrinterInterface {
 
