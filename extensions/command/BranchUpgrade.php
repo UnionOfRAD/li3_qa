@@ -1,7 +1,7 @@
 <?php
 /**
- * Lithium Hooks: A collection of git hooks & scripts that can be used for development in the
- * Lithium core and with Lithium applications.
+ * Lithium QA: a collection of commands to ensure code quality for development in the
+ *             Lithium core and with Lithium applications.
  *
  * @copyright     Copyright 2009, Union of Rad, Inc. (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
