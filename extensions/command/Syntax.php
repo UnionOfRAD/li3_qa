@@ -53,6 +53,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 * Main method.
 	 *
 	 * @param string $path Absolute path to file or directory.
+	 * @return boolean
 	 */
 	public function run($path = '.') {
 		if (!$path = realpath($path)) {
