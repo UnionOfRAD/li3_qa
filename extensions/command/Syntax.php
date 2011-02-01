@@ -139,7 +139,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	}
 
 	protected function _project($path) {
-		while ($path && !is_dir($path . '/.git') && !is_dir($path . '/config/bootstrap.php')) {
+		while ($path && !is_dir("{$path}/.git") && !is_dir("{$path}/config/bootstrap.php")) {
 			$path = ($parent = dirname($path)) != $path ? $parent : false;
 		}
 		return $path;
