@@ -37,7 +37,7 @@ class Covered extends \lithium\console\Command {
 
 		$classes = Libraries::find($library, array(
 		   'recursive' => true,
-		   'exclude' => '/tests|resources|webroot|index$|^app\\\\config|^app\\\\views/'
+		   'exclude' => '/tests|resources|webroot|index$|^app\\\\config|^app\\\\views|Exception$/'
 		));
 
 		$tests = array();
