@@ -86,7 +86,8 @@ li3 covered /path/to/library
 ```
 
 Will output something similar to the following.
-```
+
+```sh
 has test |  95.00% | lithium\util\Collection
 has test |  97.98% | lithium\util\Inflector
 has test | 100.00% | lithium\util\collection\Filters
