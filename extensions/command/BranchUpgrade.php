@@ -23,7 +23,9 @@ namespace lithium_qa\extensions\command;
  */
 class BranchUpgrade extends \lithium\console\Command {
 
-	public function run($path) {
+	public function run() {
+		$path = $this->request->action;
+
 		if (count($this->request->params['passed']) < 3) {
 			$this->error('Not enough arguments given.');
 			return false;
