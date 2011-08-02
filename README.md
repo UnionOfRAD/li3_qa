@@ -5,6 +5,7 @@ Lithium QA can be used as standalone application _or_ a plugin. The first requir
 ### Installation
 
 This project makes use of git submodules. In order to install, execute the following commands from the console. Please note that components of Lithium QA interact with the VCS of your project. Currently only GIT is supported a such.
+
 ```
 cd ~
 git clone code@rad-dev.org:lithium_qa.git 
@@ -18,22 +19,26 @@ git submodule update
 Files can be syntax checked using the Syntax command which comes with the application. The command utilizes [PHPca](http://github.com/UnionOfRAD/phpca/) to check the syntax of PHP files against a set of rules. These rules are based upon the [Lithium Coding Standards](http://dev.lithify.me/lithium/wiki/standards/coding) and the [Lithium Code Documentation](http://dev.lithify.me/lithium/wiki/standards/documenting) Standards.
 
 The basic usage is: 
+
 ```
 li3 syntax [--metrics] [--blame] PATH
 ```
 
 Here we are checking the whole file tree of our pet project:
+
 ```
 cd path/to/lithium_qa
 li3 syntax /path/to/pet
 ```
 
 If you want to log the output to a file (and your on *nix) this might come in handy:
+
 ```
 li3 syntax /path/to/pet 2>&1 | tee verify_pet.log
 ```
 
 Blame each failure and show metrics:
+
 ```
 li3 syntax --metrics --blame /path/to/pet
 ```
