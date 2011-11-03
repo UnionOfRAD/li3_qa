@@ -8,7 +8,7 @@ This project makes use of git submodules. In order to install, execute the follo
 
 ```
 cd ~
-git clone code@rad-dev.org:lithium_qa.git 
+git clone git://github.com/UnionOfRAD/lithium_qa.git
 cd lithium_qa
 git submodule init
 git submodule update
