@@ -9,6 +9,7 @@
 
 namespace li3_qa\extensions\command;
 
+use lithium\core\Libraries;
 use lithium\util\String;
 use spriebsch\PHPca\Application;
 use spriebsch\PHPca\Configuration;
@@ -73,7 +74,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		$app = new Application(getcwd());
 		$app->registerProgressPrinter($this);
 
-		$file = LITHIUM_APP_PATH . '/libraries/phpca/src/Standard/lithium.ini';
+		$file = Libraries::get('phpca', 'path') . '/Standard/lithium.ini';
 
 		$config = new Configuration(getcwd());
 		$config->setStandard(parse_ini_file($file, true));
