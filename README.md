@@ -69,7 +69,8 @@ Now add the following code to .git/hooks/pre-commit and adjust the `LI3` value.
 ```sh
 #!/bin/sh
 
-LI3=/path/to/lithium/libraries/lithium/console/li3
+APP=$HOME/path/to/lithium/framework
+LI3=$APP/libraries/lithium/console/li3
 
 if git-rev-parse --verify HEAD >/dev/null 2>&1
 then
@@ -84,11 +85,11 @@ PROJECT=`pwd`
 
 for FILE in `git diff-index --cached --name-only --diff-filter=AM ${AGAINST}`
 do
-    ${LI3} syntax ${PROJECT}/${FILE}
+    cd $APP && $LI3 syntax ${PROJECT}/${FILE}
     test $? != 0 && EXIT_STATUS=1
 done
 
-exit ${EXIT_STATUS}
+exit $EXIT_STATUS
 ```
 
 Now when committing each file the syntax is checked. The commit is aborted if a check failed. If you don't want to have the hook run on commit pass the `--no-verify` option to git commit.
