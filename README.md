@@ -24,7 +24,6 @@ Finally we pull in all submodules in this case the application, its submodules (
 
 ```
 git submodule update --init --recursive
->>>>>>> Entirely converting to a library.
 ```
 
 ### Syntax Command
