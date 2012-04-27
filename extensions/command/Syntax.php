@@ -108,33 +108,32 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	public function showProgress($file, Result $result, Application $application) {
 		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) . '`';
 
+		$format = function($result) {
+			return sprintf(
+				$this->blame ? '%1$4s| %2$3s| %3$20s| %4$s' : '%1$4s| %2$3s| %4$s',
+				$result->getLine() ?: '??',
+				$result->getColumn() ?: '??',
+				$this->_blame($result) ?: '??',
+				$result->getMessage() ?: '??'
+			);
+		};
+
 		if ($result->wasSkipped($file)) {
 			$this->out("[Skipped] {$message}");
 		} elseif ($result->hasLintError($file)) {
 			$this->out("[Error  ] {$message}");
-			$error = $result->getLintError($file);
-			$this->out(sprintf(
-				$this->blame ? '%1$4u| %2$3u| %3$20s| %4$s' : '%1$4u| %2$3u| %4$s',
-				$error->getLine() ?: '??',
-				$error->getColumn() ?: '??',
-				$this->_blame($error) ?: '??',
-				$error->getMessage() ?: '??'
-			));
-
+			$this->out($format($result->getLintError($file)));
 		} elseif ($result->hasRuleError($file)) {
 			$this->out("[Error  ] {$message}");
 
+			foreach ($result->getRuleErrors($file) as $error) {
+				$this->out($format($error));
+			}
 		} elseif ($result->hasViolations($file)) {
 			$this->out("[Failed ] {$message}");
 
 			foreach ($result->getViolations($file) as $violation) {
-				$this->out(sprintf(
-					$this->blame ? '%1$4u| %2$3u| %3$20s| %4$s' : '%1$4u| %2$3u| %4$s',
-					$violation->getLine() ?: '??',
-					$violation->getColumn() ?: '??',
-					$this->_blame($violation) ?: '??',
-					$violation->getMessage() ?: '??'
-				));
+				$this->out($format($violation));
 			}
 		} else {
 			$this->out("[Passed ] {$message}");
