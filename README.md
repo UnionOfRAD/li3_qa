@@ -1,22 +1,35 @@
 ### Requirements
 
-Lithium QA can be used as standalone application _or_ a plugin. The first requiring just lithium itself, the latter requiring an application and lithium. We take care that Lithium QA master is compatible with most recent lithium core. However sometimes changes have to be made rendering QA incompatible with older lithium cores. In that case please choose a tag version of Lithium QA.
+Lithium QA can be used as library plugged into a Lithium application. 
+
+Code in the master branch should always be compatible with the most recent Lithium core. However sometimes changes have to be made rendering QA incompatible with older cores. In that case please choose a tagged version of QA. Please note that components of QA will try to interact with the VCS of the project you are checking. Only GIT is supported a such.
 
 ### Installation
 
-This project makes use of git submodules. In order to install, execute the following commands from the console. Please note that components of Lithium QA interact with the VCS of your project. Currently only GIT is supported a such.
+We'll first obtain a new Lithium application. Than register QA as a submodule into the applications libraries. 
 
 ```
-cd ~
-git clone git://github.com/UnionOfRAD/lithium_qa.git
-cd lithium_qa
-git submodule init
-git submodule update
+git clone git://github.com/UnionOfRAD/framework.git new
+cd new
+git submodule add git://github.com/UnionOfRAD/li3_qa.git libraries/li3_qa
+```
+
+Now we make the application aware of the new library by adding the following line to `config/bootstrap/libraries.php`.
+
+```
+Libraries::add('li3_qa');
+```
+
+Finally we pull in all submodules in this case the application, its submodules (Lithium), li3_qa and li3_qa's submodules (phpca).
+
+```
+git submodule update --init --recursive
+>>>>>>> Entirely converting to a library.
 ```
 
 ### Syntax Command
 
-Files can be syntax checked using the Syntax command which comes with the application. The command utilizes [PHPca](http://github.com/UnionOfRAD/phpca/) to check the syntax of PHP files against a set of rules. These rules are based upon the [Lithium Coding Standards](http://dev.lithify.me/lithium/wiki/standards/coding) and the [Lithium Code Documentation](http://dev.lithify.me/lithium/wiki/standards/documenting) Standards.
+Files can be syntax checked using the Syntax command which comes with the application. The command utilizes [PHPca](http://github.com/UnionOfRAD/phpca/) to check the syntax of PHP files against a set of rules. These rules are based upon the [Lithium Coding Standards](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Coding) and the [Lithium Code Documentation](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Documenting) Standards.
 
 The basic usage is: 
 
@@ -27,20 +40,19 @@ li3 syntax [--metrics] [--blame] PATH
 Here we are checking the whole file tree of our pet project:
 
 ```
-cd path/to/lithium_qa
-li3 syntax /path/to/pet
+li3 syntax /path/to/project
 ```
 
 If you want to log the output to a file (and your on *nix) this might come in handy:
 
 ```
-li3 syntax /path/to/pet 2>&1 | tee verify_pet.log
+li3 syntax /path/to/project 2>&1 | tee verify_project.log
 ```
 
 Blame each failure and show metrics:
 
 ```
-li3 syntax --metrics --blame /path/to/pet
+li3 syntax --metrics --blame /path/to/project
 ```
 
 ### GIT Pre Commit Hook
@@ -53,12 +65,11 @@ cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
 chmod a+x .git/hooks/pre-commit
 ```
    
-Now add the following code to .git/hooks/pre-commit and adjust the `LITHIUM_QA` and `LI3` values.
+Now add the following code to .git/hooks/pre-commit and adjust the `LI3` value.
 
 ```sh
 #!/bin/sh
 
-LITHIUM_QA=/path/to/lithium_qa
 LI3=/path/to/lithium/libraries/lithium/console/li3
 
 if git-rev-parse --verify HEAD >/dev/null 2>&1
@@ -74,7 +85,7 @@ PROJECT=`pwd`
 
 for FILE in `git diff-index --cached --name-only --diff-filter=AM ${AGAINST}`
 do
-    cd ${LITHIUM_QA} && ${LI3} syntax ${PROJECT}/${FILE}
+    ${LI3} syntax ${PROJECT}/${FILE}
     test $? != 0 && EXIT_STATUS=1
 done
 
@@ -85,7 +96,7 @@ Now when committing each file the syntax is checked. The commit is aborted if a 
 
 ### Covered Command
 
-Allows for checking if classes in a given library all have corresponding tests according to the Lithium standard. Also prints out coverage percentage.
+Allows for checking if classes in a given library (or project) all have corresponding tests according to the Lithium standard. Also prints out coverage percentage.
 ```
 li3 covered /path/to/library
 ```

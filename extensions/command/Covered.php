@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium_qa\extensions\command;
+namespace li3_qa\extensions\command;
 
 use lithium\core\Libraries;
 use lithium\test\Dispatcher;
