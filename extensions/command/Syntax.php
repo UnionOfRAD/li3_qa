@@ -9,11 +9,12 @@
 
 namespace li3_qa\extensions\command;
 
+use Exception;
 use lithium\core\Libraries;
 use lithium\util\String;
+use spriebsch\PHPca\Result;
 use spriebsch\PHPca\Application;
 use spriebsch\PHPca\Configuration;
-use spriebsch\PHPca\Result;
 
 /**
  * Runs syntax checks against files. This will validate
@@ -94,7 +95,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 
 		try {
 			$result = $app->run($this->php, $path, $config);
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->out($message = $e->getMessage());
 			return $message == 'No PHP files to analyze';
 		}
@@ -107,13 +108,14 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 
 	public function showProgress($file, Result $result, Application $application) {
 		$message = 'syntax check of `' . str_replace($this->_project . '/', null, $file) . '`';
+		$self = $this;
 
-		$format = function($result) {
+		$format = function ($result) use ($self) {
 			return sprintf(
-				$this->blame ? '%1$4s| %2$3s| %3$20s| %4$s' : '%1$4s| %2$3s| %4$s',
+				$self->blame ? '%1$4s| %2$3s| %3$20s| %4$s' : '%1$4s| %2$3s| %4$s',
 				$result->getLine() ?: '??',
 				$result->getColumn() ?: '??',
-				$this->_blame($result) ?: '??',
+				$self->invokeMethod('_blame', array($result)) ?: '??',
 				$result->getMessage() ?: '??'
 			);
 		};

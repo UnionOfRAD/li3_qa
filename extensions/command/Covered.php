@@ -71,6 +71,7 @@ class Covered extends \lithium\console\Command {
 	/**
 	 * Finds a library for given path.
 	 *
+	 * @param string $path The string path to check, as specified in the command execution.
 	 * @return string|void The library's name on success.
 	 */
 	protected function _library($path) {
