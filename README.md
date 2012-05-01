@@ -42,7 +42,7 @@ Here we are checking the whole file tree of our pet project:
 li3 syntax /path/to/project
 ```
 
-If you want to log the output to a file (and your on *nix) this might come in handy:
+If you want to log the output to a file (and you're on *nix) this might come in handy:
 
 ```
 li3 syntax /path/to/project 2>&1 | tee verify_project.log
