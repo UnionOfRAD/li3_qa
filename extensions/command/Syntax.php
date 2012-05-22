@@ -41,6 +41,14 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	public $blame = false;
 
 	/**
+	 * Enable plain to prevent any headers or similar decoration being output.
+	 * Good for command calls embedded into other scripts.
+	 *
+	 * @var boolean
+	 */
+	public $plain = false;
+
+	/**
 	 * Absolute path to PHP executable (optional for most environments).
 	 *
 	 * @var string
@@ -90,7 +98,10 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 			$this->error($message);
 			return false;
 		}
-
+		if (!$this->plain) {
+			$this->header('Syntax');
+			$this->out(null, 1);
+		}
 		$begin = microtime(true);
 
 		try {
