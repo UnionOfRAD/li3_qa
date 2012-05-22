@@ -20,9 +20,9 @@ use spriebsch\PHPca\Configuration;
  * Runs syntax checks against files. This will validate
  * against the Lithium coding, documentation and testing standards.
  *
- * @link http://dev.lithify.me/lithium/wiki/standards/coding
- * @link http://dev.lithify.me/lithium/wiki/standards/documenting
- * @link http://dev.lithify.me/lithium/wiki/standards/testing
+ * @link https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Coding
+ * @link https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Documenting
+ * @link https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Testing
  */
 class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\ProgressPrinterInterface {
 
