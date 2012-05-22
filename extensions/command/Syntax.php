@@ -132,24 +132,24 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		};
 
 		if ($result->wasSkipped($file)) {
-			$this->out("[Skipped] {$message}");
+			$this->out("[{:cyan}skip{:end}     ] {$message}");
 		} elseif ($result->hasLintError($file)) {
-			$this->out("[Error  ] {$message}");
+			$this->out("[{:purple}exception{:end}] {$message}");
 			$this->out($format($result->getLintError($file)));
 		} elseif ($result->hasRuleError($file)) {
-			$this->out("[Error  ] {$message}");
+			$this->out("[{:purple}exception{:end}] {$message}");
 
 			foreach ($result->getRuleErrors($file) as $error) {
 				$this->out($format($error));
 			}
 		} elseif ($result->hasViolations($file)) {
-			$this->out("[Failed ] {$message}");
+			$this->out("[{:red}fail{:end}     ] {$message}");
 
 			foreach ($result->getViolations($file) as $violation) {
 				$this->out($format($violation));
 			}
 		} else {
-			$this->out("[Passed ] {$message}");
+			$this->out("[{:green}pass{:end}     ] {$message}");
 		}
 	}
 
