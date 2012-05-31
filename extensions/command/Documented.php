@@ -45,13 +45,6 @@ class Documented extends \lithium\console\Command {
 	protected $ignore = '/template|tests/i';
 
 	/**
-	 * Method name skip regex.
-	 *
-	 * @var string
-	 **/
-	protected $methodIgnore = '/__construct|_init/i';
-
-	/**
 	 * Main method.
 	 *
 	 * @param string $path Absolute path to file or directory.
@@ -82,18 +75,26 @@ class Documented extends \lithium\console\Command {
 		$this->path = $path;
 		$this->_checkHeader();
 		$this->_checkClassDocBlock();
-		$this->_checkFunctionDocBlocks();
-		$this->_checkVarDocBlocks();
+		$this->_checkDocBlocks();
 
 		if(count($this->errors)) {
+			$this->out();
 			$this->out($this->path);
 			$this->out(implode("\n", $this->errors));
 		}
+	}
 
-		// foreach($this->tokens as &$token) {
-		// 	$token[0] = token_name($token[0]);
-		// }
-		// die('<pre>' . print_r($this->tokens, true) . '</pre>');
+	protected function debug($tokens = null) {
+		if($tokens == null) {
+			$tokens = $this->tokens;
+		}
+
+		foreach($tokens as &$token) {
+			if(is_array($token)) {
+				$token[0] = token_name($token[0]);
+			}
+		}
+		echo print_r($tokens, true);
 	}
 
 	/**
@@ -102,46 +103,34 @@ class Documented extends \lithium\console\Command {
 	 *
 	 * @return void
 	 **/
-	protected function _checkVarDocBlocks() {
-
-	}
-
-	/**
-	 * Checks each function in a file to ensure documentation.
-	 *
-	 * @return void
-	 **/
-	protected function _checkFunctionDocBlocks() {
+	protected function _checkDocBlocks() {
 		for($i = 0; $i < count($this->tokens); $i++) {
-			if($this->tokens[$i][0] == T_FUNCTION) {
-				if( // likely a closure.
-				   !is_array($this->tokens[$i + 2]) ||
-				   substr($this->tokens[$i + 2][1], 0, 1) == '$' ||
-				   strlen($this->tokens[$i + 2][1]) < 1) {
-					continue;
-				} else {
-					$functionName = $this->tokens[$i + 2][1];
+			if($this->tokens[$i][0] == T_VARIABLE || $this->tokens[$i][0] == T_FUNCTION) {
+				// Get the previous tokens.
+				// Max is 8, allows for abstract, scope, static markers.
+				$leadingTokens = array();
+				$leadingTokenTypes = array();
+				for($j = 1; $j < 9; $j++) {
+						if(!isset($this->tokens[$i - $j])) {
+							break;
+						}
+						$leadingTokens[$i - $j] = $this->tokens[$i - $j];
+						$leadingTokenTypes[$i - $j] = $this->tokens[$i - $j][0];
+						// Don't parse farther past if you run into another var/function.
+						if($this->tokens[$i - $j][0] == T_VARIABLE || $this->tokens[$i - $j][0] == T_FUNCTION) {
+							break;
+						}
 				}
-				if(preg_match($this->methodIgnore, $functionName) == 1) {
-					continue;
-				}
-				if($this->tokens[$i - 2][0] == T_STATIC) {
-					$staticMod = 2;
-					$docAt = 6;
-				} else {
-					$staticMod = 0;
-					$docAt = 4;
-				}
-				if(!in_array($this->tokens[$i - (2 + $staticMod)][0], array(T_PUBLIC, T_PRIVATE, T_PROTECTED))) {
-					$this->_error("$functionName() has no scope operator.");
-					$docAt = (2 + $staticMod);
-				}
-				if($this->tokens[$i - $docAt][0] == T_ABSTRACT) {
-					$docAt -= 2;
-				}
-				if($this->tokens[$i - $docAt][0] != T_DOC_COMMENT) {
-					$line = str_pad("line {$this->tokens[$i][2]}:", 10);
-					$this->_error("$line Function $functionName() has no documentation.");
+				// Check for a scope operator. Lack of one means we've hit a
+				// closure or a non-class var that can be ignored.
+				// Hit means this needs documentation.
+				if(
+				  	(in_array(T_PUBLIC, $leadingTokenTypes) ||
+				  	in_array(T_PROTECTED, $leadingTokenTypes) ||
+				  	in_array(T_PRIVATE, $leadingTokenTypes)) &&
+				  	!in_array(T_DOC_COMMENT, $leadingTokenTypes)
+				) {
+					$this->_error($i);
 				}
 			}
 		}
@@ -161,7 +150,7 @@ class Documented extends \lithium\console\Command {
 				}
 				if($this->tokens[$i - (2 + $abMod)][0] != T_DOC_COMMENT) {
 					$line = str_pad("line {$this->tokens[$i][2]}:", 10);
-					$this->_error("$line Main class has no associated doc block.");
+					$this->_error($i);
 				}
 			}
 		}
@@ -179,7 +168,7 @@ class Documented extends \lithium\console\Command {
 		   strstr($this->tokens[1][1], 'Lithium: the most rad php framework') === false
 		) {
 			$line = str_pad("line {$this->tokens[1][2]}:", 10);
-			$this->_error("File does not contain Lithium header.");
+			$this->_error(1);
 		}
 	}
 
@@ -189,8 +178,29 @@ class Documented extends \lithium\console\Command {
 	 * @param string $message Message to output.
 	 * @return void
 	 **/
-	protected function _error($msg) {
-		$this->errors[] = "\t{:red}$msg{:end}";
+	protected function _error($tokenIndex) {
+		if($tokenIndex == 1) {
+			$error = "line: 1\tNo file header found.";
+			$this->errors[] = "\t{:red}$error{:end}";
+			return;
+		}
+
+		$error = '';
+		switch ($this->tokens[$tokenIndex][0]) {
+			case T_VARIABLE:
+				$varname = $this->tokens[$tokenIndex][1];
+				$error = "line: {$this->tokens[$tokenIndex][2]}\t$varname not documented.";
+				break;
+			case T_FUNCTION:
+				$funcname = $this->tokens[$tokenIndex + 2][1];
+				$error = "line: {$this->tokens[$tokenIndex][2]}\t$funcname() not documented.";
+				break;
+			case T_CLASS:
+				$classname = $this->tokens[$tokenIndex + 2][1];
+				$error = "line: {$this->tokens[$tokenIndex][2]}\tClass $classname not documented.";
+				break;
+		}
+		$this->errors[] = "\t{:red}$error{:end}";
 	}
 
 	/**
@@ -203,6 +213,9 @@ class Documented extends \lithium\console\Command {
 		if (!$path = realpath($path)) {
 			$this->error('Not a valid path.');
 			return false;
+		}
+		if(is_file($path)) {
+			return array(array($path));
 		}
 		$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
 		return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
