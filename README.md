@@ -1,12 +1,12 @@
 ### Requirements
 
-Lithium QA can be used as library plugged into a Lithium application. 
+Lithium QA can be used as library plugged into a Lithium application.
 
 Code in the master branch should always be compatible with the most recent Lithium core. However sometimes changes have to be made rendering QA incompatible with older cores. In that case please choose a tagged version of QA. Please note that components of QA will try to interact with the VCS of the project you are checking. Only GIT is supported a such.
 
 ### Installation
 
-We'll first obtain a new Lithium application. Than register QA as a submodule into the applications libraries. 
+We'll first obtain a new Lithium application. Than register QA as a submodule into the applications libraries.
 
 ```
 git clone git://github.com/UnionOfRAD/framework.git new
@@ -30,7 +30,7 @@ git submodule update --init --recursive
 
 Files can be syntax checked using the Syntax command which comes with the application. The command utilizes [PHPca](http://github.com/UnionOfRAD/phpca/) to check the syntax of PHP files against a set of rules. These rules are based upon the [Lithium Coding Standards](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Coding) and the [Lithium Code Documentation](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Documenting) Standards.
 
-The basic usage is: 
+The basic usage is:
 
 ```
 li3 syntax [--metrics] [--blame] PATH
@@ -63,7 +63,7 @@ cd /path/to/project
 cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
 chmod a+x .git/hooks/pre-commit
 ```
-   
+
 Now add the following code to .git/hooks/pre-commit and adjust the `LI3` value.
 
 ```sh
@@ -112,3 +112,21 @@ has test |  95.24% | lithium\test\Dispatcher
  no test |     n/a | lithium\test\Filter
 ```
 
+### Documented Command
+
+Allows for the checking of the presence of Lithium file headers, class documenation, as well as method/param documentation.
+```
+li3 documented /path/to/library
+```
+
+Will output something similar to:
+```
+/path/to/framework/libraries/somelib/somenamespace/Foo.php
+	line: 128	__construct() not documented.
+	line: 135	_init() not documented.
+
+/path/to/framework/libraries/somelib/somenamespace/Bar.php
+	line: 1   No file header found.
+	line: 10  Class Bar not documented.
+	line: 18	$code not documented.
+```
