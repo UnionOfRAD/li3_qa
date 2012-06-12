@@ -40,7 +40,7 @@ class Documented extends \lithium\console\Command {
 	 *
 	 * @var string
 	 **/
-	protected $ignore = '/template|tests/i';
+	protected $ignore = '/template|tests|views/i';
 
 	/**
 	 * Main method.
@@ -48,12 +48,13 @@ class Documented extends \lithium\console\Command {
 	 * @param string $path Absolute path to file or directory.
 	 * @return boolean
 	 */
-	public function run() {
-		if ($files = $this->_getFiles($this->request->action)) {
+	public function run($path = '.') {
+		if ($files = $this->_getFiles($path)) {
 			foreach ($files as $file) {
-				$this->_checkFile($file[0]);
+				$this->checkFile($file[0]);
 			}
 		}
+		$this->out("\n{:green}Check complete.{:end}");
 		return true;
 	}
 
@@ -63,9 +64,9 @@ class Documented extends \lithium\console\Command {
 	 * @param string $path Path to file to be inspected.
 	 * @return void
 	 **/
-	protected function _checkFile($path) {
+	public function checkFile($path) {
 		if (preg_match($this->ignore, $path) == 1){
-			return;
+			return true;
 		}
 
 		$this->errors = array();
@@ -76,10 +77,10 @@ class Documented extends \lithium\console\Command {
 		$this->_checkDocBlocks();
 
 		if (count($this->errors)) {
-			$this->out();
-			$this->out($this->path);
-			$this->out(implode("\n", $this->errors));
+			$this->out("\n" . $this->path . "\n" . implode("\n", $this->errors));
+			return false;
 		}
+		return true;
 	}
 
 	protected function debug($tokens = null) {
@@ -96,8 +97,8 @@ class Documented extends \lithium\console\Command {
 	}
 
 	/**
-	 * Ensures each class variable is documented. The assumption is that if a
-	 * variable is preceeded by a scope definition, it's a class variable.
+	 * Ensures each class variable or method is documented. The assumption is that if a
+	 * member is preceeded by a scope definition, it needs docs.
 	 *
 	 * @return void
 	 **/
@@ -158,6 +159,9 @@ class Documented extends \lithium\console\Command {
 	 * @return void
 	 **/
 	protected function _checkHeader() {
+		if (!isset($this->tokens[1]) || !is_array($this->tokens[1])) {
+			$this->_error(1);
+		}
 		$containsHeader = strstr($this->tokens[1][1], 'the most rad php framework') === false;
 		if ($this->tokens[1][0] != T_DOC_COMMENT || $containsHeader) {
 			$this->_error(1);
