@@ -18,28 +18,28 @@ class Documented extends \lithium\console\Command {
 	 * Current file's token set.
 	 *
 	 * @var array
-	 **/
+	 */
 	protected $tokens = array();
 
 	/**
 	 * Current file path.
 	 *
 	 * @var string
-	 **/
+	 */
 	protected $path = '';
 
 	/**
 	 * Errors for the current file.
 	 *
 	 * @var array
-	 **/
+	 */
 	protected $errors = array();
 
 	/**
 	 * Filename skip regex.
 	 *
 	 * @var string
-	 **/
+	 */
 	protected $ignore = '/template|tests|views/i';
 
 	/**
@@ -63,7 +63,7 @@ class Documented extends \lithium\console\Command {
 	 *
 	 * @param string $path Path to file to be inspected.
 	 * @return void
-	 **/
+	 */
 	public function checkFile($path) {
 		if (preg_match($this->ignore, $path) == 1){
 			return true;
@@ -101,7 +101,7 @@ class Documented extends \lithium\console\Command {
 	 * member is preceeded by a scope definition, it needs docs.
 	 *
 	 * @return void
-	 **/
+	 */
 	protected function _checkDocBlocks() {
 		for ($i = 0; $i < count($this->tokens); $i++) {
 			if ($this->tokens[$i][0] == T_VARIABLE || $this->tokens[$i][0] == T_FUNCTION) {
@@ -137,17 +137,19 @@ class Documented extends \lithium\console\Command {
 	 * Makes sure main class is documented.
 	 *
 	 * @return void
-	 **/
+	 */
 	protected function _checkClassDocBlock() {
 		for ($i = 0; $i < count($this->tokens); $i++) {
 			if ($this->tokens[$i][0] == T_CLASS) {
 				$abMod = 0;
-				if ($this->tokens[$i - 2][0] == T_ABSTRACT) {
+				if (isset($this->tokens[$i - 2][0]) && $this->tokens[$i - 2][0] == T_ABSTRACT) {
 					$abMod = 2;
 				}
-				if ($this->tokens[$i - (2 + $abMod)][0] != T_DOC_COMMENT) {
-					$line = str_pad("line {$this->tokens[$i][2]}:", 10);
-					$this->_error($i);
+				if (isset($this->tokens[$i - (2 + $abMod)][0])) {
+					if ($this->tokens[$i - (2 + $abMod)][0] != T_DOC_COMMENT) {
+						$line = str_pad("line {$this->tokens[$i][2]}:", 10);
+						$this->_error($i);
+					}
 				}
 			}
 		}
@@ -157,7 +159,7 @@ class Documented extends \lithium\console\Command {
 	 * Makes sure the file includes the UoR header.
 	 *
 	 * @return void
-	 **/
+	 */
 	protected function _checkHeader() {
 		if (!isset($this->tokens[1]) || !is_array($this->tokens[1])) {
 			$this->_error(1);
@@ -173,7 +175,7 @@ class Documented extends \lithium\console\Command {
 	 *
 	 * @param integer $tokenIndex Token related to error.
 	 * @return void
-	 **/
+	 */
 	protected function _error($tokenIndex) {
 		if ($tokenIndex == 1) {
 			$error = "line: 1\tNo file header found.";
@@ -204,7 +206,7 @@ class Documented extends \lithium\console\Command {
 	 *
 	 * @param string $path Path to PHP files.
 	 * @return RegexIterator
-	 **/
+	 */
 	protected function _getFiles($path) {
 		if (!$path = realpath($path)) {
 			$this->error('Not a valid path.');

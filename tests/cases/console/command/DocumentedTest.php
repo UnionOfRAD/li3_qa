@@ -23,7 +23,7 @@ class DocumentedTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		foreach ($this->_files as $file) {
-			if(file_exists($file)) {
+			if (file_exists($file)) {
 				unlink($file);
 			}
 		}
@@ -82,8 +82,20 @@ class Foo {}
 		return $path;
 	}
 
-	public function testClassDocBlock() {
+	protected function _expectResponseFromFile($expected, $contents, $not = false) {
+		$tempFile = $this->_tempFileWithContents($contents);
 		$command = new Documented(array('request' => $this->request, 'classes' => $this->classes));
+		$command->run($tempFile);
+		$expected = preg_quote($expected);
+		if (!$not) {
+			$this->assertPattern("/{$expected}/", $command->response->output);
+		} else {
+			$this->assertNoPattern("/{$expected}/", $command->response->output);
+		}
+
+	}
+
+	public function testClassDocBlock() {
 		$contents = "<?php
 /**
  * Lithium: the most rad php framework
@@ -96,17 +108,125 @@ namespace foo\bar;
 
 class Foo {}
 ?>";
-		$noClassDocs = $this->_tempFileWithContents($contents);
-		$this->assertTrue(!$command->checkFile($noClassDocs));
-
-		$command = new Documented(array('request' => $this->request, 'classes' => $this->classes));
-		$command->run($noClassDocs);
-		$expected = preg_quote('Class Foo not documented');
-		$this->assertPattern("/{$expected}/", $command->response->output);
+		$this->_expectResponseFromFile('Class Foo not documented', $contents);
 	}
 
 	public function testClassVarsDocBlocks() {
-		$command = new Documented(array('request' => $this->request, 'classes' => $this->classes));
+		$contents = "<?php
+class Foo {
+	public \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	public \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents, true);
+
+		$contents = "<?php
+class Foo {
+	public static \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	public static \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents, true);
+
+		$contents = "<?php
+class Foo {
+	abstract public static \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	abstract public static \$foo = 'bar';
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents, true);
+	}
+
+	public function testMethodDocBlocks() {
+		$contents = "<?php
+class Foo {
+	public function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('foo() not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	public function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('$foo not documented', $contents, true);
+
+		$contents = "<?php
+class Foo {
+	public static function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('foo() not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	public static function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('foo() not documented', $contents, true);
+
+		$contents = "<?php
+class Foo {
+	abstract public static function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('foo() not documented', $contents);
+
+		$contents = "<?php
+class Foo {
+	/**
+	 * Some docs for this string var.
+	 *
+	 * @var string
+	 */
+	abstract public static function foo() {}
+}
+?>";
+		$this->_expectResponseFromFile('foo() not documented', $contents, true);
 	}
 }
 
