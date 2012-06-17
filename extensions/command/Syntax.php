@@ -55,6 +55,13 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 	 */
 	public $php;
 
+	/**
+	 * Alternative syntax standards to use.
+	 *
+	 * @var string
+	 */
+	public $standard;
+
 	protected $_project;
 
 	protected $_vcs;
@@ -83,7 +90,7 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 		$app = new Application(getcwd());
 		$app->registerProgressPrinter($this);
 
-		$file = Libraries::get('phpca', 'path') . '/Standard/lithium.ini';
+		$file = $this->_standard();
 
 		$config = new Configuration(getcwd());
 		$config->setStandard(parse_ini_file($file, true));
@@ -115,6 +122,34 @@ class Syntax extends \lithium\console\Command implements \spriebsch\PHPca\Progre
 			$this->_metrics($result, microtime(true) - $begin);
 		}
 		return !$result->hasErrors();
+	}
+
+	protected function _standard() {
+		$default = Libraries::get('phpca', 'path') . '/Standard/lithium.ini';
+		$config = Libraries::get('li3_qa') + array('standard' => false);
+		$notFound = ' Could not find `{:standard}`.';
+		$nextBest = ' Using `{:standard}` instead.';
+		$msg = '';
+
+		foreach (array($this->standard, $config['standard']) as $standard) {
+			if (!$standard) {
+				continue;
+			}
+			if (file_exists($standard)) {
+				if ($msg) {
+					$msg .=  String::insert($nextBest, compact('standard'));
+					$this->error(trim($message));
+				}
+				return $standard;
+			}
+			$msg .= String::insert($notFound, compact('standard'));
+		}
+		if ($msg) {
+			$standard = 'Lithium defaults';
+			$msg .=  String::insert($nextBest, compact('standard'));
+			$this->error(trim($message));
+		}
+		return $default;
 	}
 
 	public function showProgress($file, Result $result, Application $application) {
